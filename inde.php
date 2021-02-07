@@ -1,12 +1,6 @@
 <?php
 require 'functions.php';
 $mahasiswa = query("SELECT * FROM mahasiswa");
-
-//Tombol Cari
-if ( isset($_POST["cari"])){
-    $mahasiswa = cari($_POST["keyword"]);
-}
-
 ?>
 
 <html lang="en">
@@ -20,14 +14,6 @@ if ( isset($_POST["cari"])){
 <body>
     <a href="tambah.php"> Tambah Data Mahasiswa</a>
     <br><br>
-
-    <form action="" method="post">
-    
-        <input type="text" name="keyword" size="40" autofocus placeholder="Masukkan Keyword Pencarian" autocomplete="off">
-        <button type="submit" name="cari">Cari !</button>
-
-    </form>
-
     <table border="1" cellpadding="10" cellspacing="0">
         <tr>
             <th>No.</th>
