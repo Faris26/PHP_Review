@@ -21,7 +21,13 @@ function tambah($data)
     $nama = htmlspecialchars($data['nama']);
     $email = htmlspecialchars($data['email']);
     $jurusan = htmlspecialchars($data['jurusan']);
-    $gambar = htmlspecialchars($data['gambar']);
+
+    // $gambar = htmlspecialchars($data['gambar']);
+    //upload gambar
+    $gambar = upload();
+    if (!$gambar) {
+        return false;
+    }
 
     $query = "INSERT INTO mahasiswa VALUES
     ('', '$nrp' , '$nama' ,'$email' ,'$jurusan' ,'$gambar') 
@@ -30,6 +36,51 @@ function tambah($data)
 
     return mysqli_affected_rows($conn);
 }
+
+function upload()
+{
+    $namaFile = $_FILES['gambar']['name'];
+    $ukuranFile = $_FILES['gambar']['size'];
+    $error = $_FILES['gambar']['error'];
+    $tmpName = $_FILES['gambar']['tmp_name'];
+
+    //cek apakah tidak ada yang diupload 
+    if ($error === 4) {
+        echo "<script> 
+               alert('Pilih Gambar Dulu !');        
+            </script>";
+        return false;
+    }
+    //cek apakah yang diupload gambar
+    $ekstensiGambarValid = ['jpg', 'jpeg', 'png'];
+    $ekstensiGambar = explode('.', $namaFile);
+    $ekstensiGambar = strtolower(end($ekstensiGambar));
+    if (!in_array($ekstensiGambar, $ekstensiGambarValid)) {
+        echo "<script> 
+        alert('Yang Anda Upload Bukan Gambar !');        
+        </script>";
+        return false;
+    }
+    //cek jika ukuran terlalu besar 
+    if($ukuranFile > 5000000){
+        echo "<script> 
+               alert('Ukuran Gambar Terlalu besar !');        
+            </script>";
+        return false;
+    }
+
+    //lolos pengecekan , siap diupload
+    //generate Nama Baru
+    $namaFileBaru = uniqid();
+    $namaFileBaru .= '.';
+    $namaFileBaru .= $ekstensiGambar;
+    
+    move_uploaded_file($tmpName, 'gambar/'. $namaFileBaru);
+
+    return $namaFileBaru;
+}
+
+
 function hapus($id)
 {
     global $conn;
@@ -41,11 +92,19 @@ function update($data)
 {
     global $conn;
     $id = ($data["id"]);
-    $nrp = htmlspecialchars($data["nrp"]);
+    $nrp = htmlspecialchars($data["nrp"]); 
     $nama = htmlspecialchars($data["nama"]);
     $email = htmlspecialchars($data["email"]);
     $jurusan = htmlspecialchars($data["jurusan"]);
-    $gambar = htmlspecialchars($data["gambar"]);
+    $gambarLama = htmlspecialchars($data["gambarLama"]);
+
+    //cek apakah user pilih gambar  
+    if($_FILES['gambar']['error'] === 4){
+        $gambar = $gambarLama;
+    }else {
+        $gambar = upload();
+    }
+    // $gambar = htmlspecialchars($data["gambar"]);
 
     $query = "UPDATE mahasiswa SET
                 nrp = '$nrp',
@@ -61,7 +120,8 @@ function update($data)
     return mysqli_affected_rows($conn);
 }
 
-function cari($keyword){
+function cari($keyword)
+{
 
     $query = "SELECT * FROM mahasiswa WHERE 
               nama LIKE '%$keyword%' OR
