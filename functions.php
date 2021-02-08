@@ -62,7 +62,7 @@ function upload()
         return false;
     }
     //cek jika ukuran terlalu besar 
-    if($ukuranFile > 5000000){
+    if ($ukuranFile > 5000000) {
         echo "<script> 
                alert('Ukuran Gambar Terlalu besar !');        
             </script>";
@@ -74,8 +74,8 @@ function upload()
     $namaFileBaru = uniqid();
     $namaFileBaru .= '.';
     $namaFileBaru .= $ekstensiGambar;
-    
-    move_uploaded_file($tmpName, 'gambar/'. $namaFileBaru);
+
+    move_uploaded_file($tmpName, 'gambar/' . $namaFileBaru);
 
     return $namaFileBaru;
 }
@@ -92,16 +92,16 @@ function update($data)
 {
     global $conn;
     $id = ($data["id"]);
-    $nrp = htmlspecialchars($data["nrp"]); 
+    $nrp = htmlspecialchars($data["nrp"]);
     $nama = htmlspecialchars($data["nama"]);
     $email = htmlspecialchars($data["email"]);
     $jurusan = htmlspecialchars($data["jurusan"]);
     $gambarLama = htmlspecialchars($data["gambarLama"]);
 
     //cek apakah user pilih gambar  
-    if($_FILES['gambar']['error'] === 4){
+    if ($_FILES['gambar']['error'] === 4) {
         $gambar = $gambarLama;
-    }else {
+    } else {
         $gambar = upload();
     }
     // $gambar = htmlspecialchars($data["gambar"]);
@@ -131,4 +131,36 @@ function cari($keyword)
               ";
 
     return query($query);
+}
+function registrasi($data)
+{
+    global $conn;
+    $username = strtolower(stripslashes($data["username"]));
+    $password = mysqli_real_escape_string($conn, $data["password"]);
+    $password2 = mysqli_real_escape_string($conn, $data["password2"]);
+
+    //cek username sudah ada atau belum
+    $result =  mysqli_query($conn, "SELECT username FROM user WHERE username = '$username'");
+
+    if (mysqli_fetch_assoc($result)) {
+        echo "<script> 
+               alert('Username Sudah Terdaftar !');        
+            </script>";
+        return false;
+    }
+    //cek konfrmasi password
+    if ($password !==  $password2) {
+        echo "
+        <script> 
+               alert('Password Yang Anda Masukkan Tidak Sesuai !');        
+            </script>";
+        return false;
+    }
+    //enkripsi passwordnya
+    $password = password_hash($password, PASSWORD_DEFAULT);
+    mysqli_query($conn, "INSERT INTO user VALUES('','$username','$password')");
+    return mysqli_affected_rows($conn);
+    // $password = md5($password);
+    // var_dump($password);die;
+    //tambahkan user baru ke database
 }
