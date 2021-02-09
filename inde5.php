@@ -1,37 +1,19 @@
 <?php
 session_start();
 
-if (!isset($_SESSION["login"])) {
+if( !isset($_SESSION["login"])){
     header("Location: Login.php");
     exit;
 }
 
 require 'functions.php';
+$mahasiswa = query("SELECT * FROM mahasiswa");
 
-//pagination
-//konfigurasi
-$jumlahDataPerHalaman = 3;
-//Lebih Rumit
-// $result = mysqli_query($conn,"SELECT * FROM mahasiswa");
-// $jumlahData = mysqli_num_rows($result);
-//Lebih Simpel
-$jumlahData = count(query("SELECT * FROM mahasiswa"));
-$jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-if(isset($_GET["halaman"])){
-    $halamanAktif = $_GET("halaman");
-} else{
-    $halamanAktif = 1;
-}
-$awalData = ($jumlahDataPerHalaman * $halamanAktif) - $halamanAktif;
-
-$mahasiswa = query("SELECT * FROM mahasiswa LIMIT 0, $jumlahDataPerHalaman");
 //Tombol Cari
-if (isset($_POST["cari"])) {
+if ( isset($_POST["cari"])){
     $mahasiswa = cari($_POST["keyword"]);
 }
-//round = membulatkan desimal terdekat 
-//florr = membulatkan kebawah
-//ceil = membulatkan keatas
+
 ?>
 
 <html lang="en">
@@ -45,11 +27,11 @@ if (isset($_POST["cari"])) {
 <body>
     <a href="tambah.php"> Tambah Data Mahasiswa</a>
     <br><br>
-
+    
     <a href="Logout.php"> Logout</a>
 
     <form action="" method="post">
-
+    
         <input type="text" name="keyword" size="40" autofocus placeholder="Masukkan Keyword Pencarian" autocomplete="off">
         <button type="submit" name="cari">Cari !</button>
 
