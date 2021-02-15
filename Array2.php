@@ -34,17 +34,6 @@ $angka = [3, 2, 15, 20, 19];
     <div class="kotak"><?php  echo $a; ?></div>
     <?php } ?>
 
-
-
-
-
-
-
-
-
-
-
-
 </body>
 
 </html>
